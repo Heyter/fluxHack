@@ -23,16 +23,6 @@
 
 using namespace std::experimental::filesystem;
 
-// https://github.com/ScalletaZ/LuaCSGO
-// https://www.unknowncheats.me/forum/cs-go-releases/153967-luacsgo-lua-api-csgo.html
-// https://github.com/things-i-want-to-forget/lua-flex
-// https://github.com/ar1a/CS-Lua/tree/master/CSLua/CS-Lua
-// https://www.unknowncheats.me/forum/counterstrike-global-offensive/164279-cs-lua-progress-thread.html
-
-// https://github.com/darkjacky/gm_strafe/blob/master/source/main.cpp
-// https://github.com/Gubbi099/qrex-inject/blob/fbad9deb4f74129e77306f5a3e5b0a30cce67ebc/Qrex-Inject/Qrex-Inject/GLua.h
-// https://github.com/PhoenixBlack/gm_turbostroi/blob/master/source/gm_turbostroi.cpp
-
 ConsoleManager g_c;
 
 LUAInterfaces g_Interfaces;
