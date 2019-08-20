@@ -1,0 +1,5 @@
+hook.Add("Paint", "TEST", function(vPanel) -- vPanel = CPanel::GetName() (HUDGmod, OverlayPopupPanel, etc)
+	surface.SetDrawColor(255,255,255,255)
+	surface.DrawText("Привет Мир!", 2, 2, 'ExampleFont')
+	surface.DrawText("Hello World!", 10, 10, 'SchemeFont')
+end)
