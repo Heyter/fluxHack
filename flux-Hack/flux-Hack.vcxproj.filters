@@ -21,19 +21,10 @@
     <ClCompile Include="sdk\interface\Engine.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="sdk\interface\EngineTrace.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="sdk\interface\EntityList.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="sdk\interface\Globals.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="sdk\interface\ModelInfo.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="sdk\interface\Predictionandmovement.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="sdk\InterfaceManager.cpp">
@@ -46,9 +37,6 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="LuaEngine.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="sdk\InputManager.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="sdk\interface\Panel.cpp">
@@ -67,6 +55,15 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="sdk\interface\Scheme.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="sdk\Offsets.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="sdk\interface\HLClient.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="sdk\UtilsFuncs.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
@@ -140,9 +137,6 @@
     <ClInclude Include="sdk\interface\Engine.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="sdk\interface\EngineTrace.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="sdk\interface\EntityList.h">
       <Filter>Header Files</Filter>
     </ClInclude>
@@ -152,19 +146,10 @@
     <ClInclude Include="sdk\interface\InterfaceBase.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="sdk\interface\ModelInfo.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="sdk\interface\Predictionandmovement.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="sdk\Address.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="sdk\CBaseEntity.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="sdk\cmove.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="sdk\HookBase.h">
@@ -174,9 +159,6 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="sdk\math.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="sdk\usercmd.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="sdk\Vector.h">
@@ -200,22 +182,13 @@
     <ClInclude Include="exports\LUAEngine.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="exports\LUAUserCmd.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="exports\LUAEntity.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="exports\LUAEntityList.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="exports\LUATrace.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="exports\LUAUtils.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="sdk\InputManager.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="exports\LuaFiles.h">
@@ -225,9 +198,6 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="sdk\interface\Panel.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="resource.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="Drawing.h">
@@ -242,24 +212,6 @@
     <ClInclude Include="sdk\PatternScanning.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="LuaBridge\List.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="LuaBridge\Map.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="LuaBridge\Vector.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="LuaBridge\UnorderedMap.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="LuaBridge\detail\Config.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="LuaBridge\detail\Security.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="sdk\interface\GLua.h">
       <Filter>Header Files</Filter>
     </ClInclude>
@@ -267,6 +219,21 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="sdk\interface\Scheme.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="sdk\NetVarManager.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="sdk\Offsets.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="sdk\recv.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="sdk\interface\HLClient.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="sdk\UtilsFuncs.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

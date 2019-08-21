@@ -60,7 +60,10 @@ public:
 		return glua->GetType(iStackPos);
 	}
 
-	void GetLuaInterface(GLuaInterfaceType type) {
+	void GetLuaInterface() {
+		GLuaInterfaceType type = GLuaInterfaceType::MENU;
+		if (g_pEngine->IsInGame())
+			type = GLuaInterfaceType::CLIENT;
 		glua = g_pGLuaShared->GetLuaInterface(type);
 	}
 	

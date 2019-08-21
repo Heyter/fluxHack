@@ -11,14 +11,13 @@
 #include "LuaEngine.h"
 #include "sdk\InterfaceManager.hpp"
 #include "exports\Exports.h"
-#include "sdk\cmove.h"
-#include "sdk\InputManager.h"
 #include "exports\LuaFiles.h"
 #include "sdk\interface\Panel.h"
 #include "Drawing.h"
 #include "GLuaSharedApi.h"
 #include "sdk\interface\Globals.h"
 #include "sdk\Console.h"
+#include "sdk/interface/HLClient.h"
 #include <shlobj.h>
 
 using namespace std::experimental::filesystem;
@@ -75,73 +74,6 @@ void Msg(char const* msg)
 	va_end(list);
 	oMsg(buffer, list);
 }
-
-//typedef void(__thiscall* FrameStageNotifyFn)(void*, unsigned int);
-//FrameStageNotifyFn oFrameStageNotify;
-enum ClientFrameStage_t {
-	FRAME_UNDEFINED = -1,			// (haven't run any frames yet)
-	FRAME_START,
-
-	// A network packet is being recieved
-	FRAME_NET_UPDATE_START,
-	// Data has been received and we're going to start calling PostDataUpdate
-	FRAME_NET_UPDATE_POSTDATAUPDATE_START,
-	// Data has been received and we've called PostDataUpdate on all data recipients
-	FRAME_NET_UPDATE_POSTDATAUPDATE_END,
-	// We've received all packets, we can now do interpolation, prediction, etc..
-	FRAME_NET_UPDATE_END,
-
-	// We're about to start rendering the scene
-	FRAME_RENDER_START,
-	// We've finished rendering the scene.
-	FRAME_RENDER_END
-};
-
-/*void __fastcall hkFrameStageNotify(void* thisptr, void*, unsigned int type)
-{
-	LOCKLUA();
-	Vector oldviewpunch;
-	Vector oldaimpunch;
-	bool shouldnullview = false;
-	if (type == FRAME_RENDER_START) {
-
-		using namespace luabridge;
-		LuaRef hook = getGlobal(g_pLuaEngine->L(), "hook");
-		if (hook["Call"].isFunction())
-		{
-			try {
-				shouldnullview = hook["Call"]("ShouldRemoveViewPunch").cast<bool>();
-			}
-			catch (LuaException const& e)
-			{
-				//If this is called then there was no hook for "ShouldRemoveViewPunch" registered. This isn't an issue.
-			}
-		}
-		else
-		{
-			printf("ERR: PT - hook.Call not found!\n");
-		}
-
-		if (shouldnullview) {
-			CBaseEntity* ent = (CBaseEntity*)g_Utils.LocalPlayer();
-			if (ent) {
-				oldviewpunch = *(Vector*)(ent + 0x4BB8 + 0x64);
-				oldaimpunch = *(Vector*)(ent + 0x4BB8 + 0x70);
-
-				*(Vector*)(ent + 0x4BB8 + 0x64) = Vector(0, 0, 0);
-				*(Vector*)(ent + 0x4BB8 + 0x70) = Vector(0, 0, 0);
-			}
-		}
-	}
-	oFrameStageNotify(thisptr, type);
-	if (shouldnullview) {
-		CBaseEntity* ent = (CBaseEntity*)g_Utils.LocalPlayer();
-		if (ent) {
-			*(Vector*)(ent + 0x4BB8 + 0x64) = oldviewpunch;
-			*(Vector*)(ent + 0x4BB8 + 0x70) = oldaimpunch;
-		}
-	}
-}*/
 
 #include "sdk/PatternScanning.h"
 
@@ -200,7 +132,6 @@ static void RegEverything(lua_State* L)
 			.beginClass<LUAInterfaces>("__Interfaces")
 				.addFunction("GetEngine", &LUAInterfaces::GetEngine)
 				.addFunction("GetEntityList", &LUAInterfaces::GetEntityList)
-				.addFunction("GetTrace", &LUAInterfaces::GetTrace)
 			.endClass()
 			.beginClass<LUAEngine>("EngineInterface")
 				.addFunction("GetScreenSize", &LUAEngine::GetScreenSize)
@@ -235,61 +166,24 @@ static void RegEverything(lua_State* L)
 				.addData("x", &Vec2::x)
 				.addData("y", &Vec2::y)
 			.endClass()
-			.beginClass<LuaUserCmd>("UserCmd")
-				.addProperty("buttons", &LuaUserCmd::GetButtons, &LuaUserCmd::SetButtons)
-				.addProperty("viewangles", &LuaUserCmd::GetViewAngles, &LuaUserCmd::SetViewAngles)
-				.addFunction("KeyDown", &LuaUserCmd::KeyDown)
-				.addFunction("AddButton", &LuaUserCmd::AddButton)
-				.addFunction("RemoveButton", &LuaUserCmd::RemoveButton)
-			.endClass()
 			.beginClass<LUAEntity>("Entity")
 				.addFunction("IsValid", &LUAEntity::IsValid)
 				.addFunction("GetPos", &LUAEntity::GetPos)
 				.addFunction("GetHealth", &LUAEntity::GetHealth)
-				.addFunction("GetFlags", &LUAEntity::GetFlags)
-				.addFunction("GetShootPos", &LUAEntity::GetShootPos)
+				.addFunction("GetMaxHealth", &LUAEntity::GetMaxHealth)
 				.addFunction("IsDormant", &LUAEntity::IsDormant)
 				.addFunction("IsAlive", &LUAEntity::IsAlive)
-				.addFunction("GetTeam", &LUAEntity::GetTeam)
-				.addFunction("GetPunch", &LUAEntity::GetPunch)
+				.addFunction("IsPlayer", &LUAEntity::IsPlayer)
 				.addFunction("IsReal", &LUAEntity::IsReal)
-				.addFunction("GetAmmo", &LUAEntity::GetAmmo)
-				.addFunction("GetAmmoReserve", &LUAEntity::GetBackupAmmo)
-				.addFunction("GetArmor", &LUAEntity::GetArmor)
-				.addFunction("GetIndex", &LUAEntity::GetIndex)
 				.addFunction("Nick", &LUAEntity::GetName)
 			.endClass()
 			.beginClass<LUAEntityList>("EntityList")
 				.addFunction("GetEntity", &LUAEntityList::GetEntity)
 				.addFunction("GetHighestEntityIndex", &LUAEntityList::GetHighestEntityIndex)
 			.endClass()
-			.beginClass<LUATrace>("EngineTrace")
-				.addFunction("Trace", &LUATrace::TraceRay)
-			.endClass()
-			.beginClass<LUAtrace_t>("trace_t")
-				.addFunction("DidHit", &LUAtrace_t::DidHit)
-				.addFunction("DidHitEntity", &LUAtrace_t::DidHitEntity)
-				.addFunction("GetHitbox", &LUAtrace_t::GetHitbox)
-				.addFunction("IsVisible", &LUAtrace_t::IsVisible)
-				.addFunction("GetEndPos", &LUAtrace_t::GetEndPos)
-				.addFunction("GetEntity", &LUAtrace_t::GetEntity)
-			.endClass()
 			.beginClass<LUAUtils>("__Utils")
-				.addFunction("IsPlayer", &LUAUtils::IsPlayer)
-				.addFunction("GetHitboxPos", &LUAUtils::GetHitboxPosition)
 				.addFunction("LocalPlayer", &LUAUtils::LocalPlayer)
 				.addFunction("GetSchemeFont", &LUAUtils::GetSchemeFont)
-			.endClass()
-			.beginClass<KeyData>("KeyData")
-				.addData("key", &KeyData::key, false)
-				.addProperty("down", &KeyData::IsDown)
-				.addProperty("held", &KeyData::IsHeld)
-				.addData("processed", &KeyData::processed, false)
-			.endClass()
-			.beginClass<MouseData>("MouseData")
-				.addProperty("button", &MouseData::GetButton)
-				.addProperty("down", &MouseData::IsDown)
-				.addProperty("pos", &MouseData::GetPos)
 			.endClass()
 			.beginClass<CDrawing>("__Drawing")
 				.addFunction("DrawString", &CDrawing::DrawString)
@@ -330,69 +224,6 @@ static void RegEverything(lua_State* L)
 	g_pLuaEngine->ExecuteString("bit = bit32");
 }
 
-struct CViewSetup
-{
-	char _0x0000[16];
-	__int32 x;
-	__int32 x_old;
-	__int32 y;
-	__int32 y_old;
-	__int32 width;
-	__int32    width_old;
-	__int32 height;
-	__int32    height_old;
-	char _0x0030[128];
-	float fov;
-	float fovViewmodel;
-	Vector origin;
-	Vector angles;
-	float zNear;
-	float zFar;
-	float zNearViewmodel;
-	float zFarViewmodel;
-	float m_flAspectRatio;
-	float m_flNearBlurDepth;
-	float m_flNearFocusDepth;
-	float m_flFarFocusDepth;
-	float m_flFarBlurDepth;
-	float m_flNearBlurRadius;
-	float m_flFarBlurRadius;
-	float m_nDoFQuality;
-	__int32 m_nMotionBlurMode;
-	char _0x0104[68];
-	__int32 m_EdgeBlur;
-};
-
-/*typedef void(__thiscall* RenderViewFn)(void*, CViewSetup &setup, CViewSetup &hudViewSetup, int nClearFlags, int whatToDraw);
-RenderViewFn oRenderView;
-void __fastcall hkRenderView(void* thisptr, void*, CViewSetup &setup, CViewSetup &hudViewSetup, int nClearFlags, int whatToDraw)
-{
-	LOCKLUA();
-	using namespace luabridge;
-	LuaRef hook = getGlobal(g_pLuaEngine->L(), "hook");
-	bool shoulddrawhud = true;
-	if (hook["Call"].isFunction())
-	{
-		try {
-			shoulddrawhud = hook["Call"]("ShouldDrawHud").cast<bool>();
-		}
-		catch (LuaException const& e)
-		{
-			//If this is called then there was no hook for "ShouldDrawHud" registered. This isn't an issue.
-		}
-	}
-	else
-	{
-		printf("ERR: PT - hook.Call not found!\n");
-	}
-
-	CViewSetup fakesetup;
-	memset(&fakesetup, 0, sizeof CViewSetup);
-	setup.fovViewmodel = 90.f;
-	oRenderView(thisptr, setup, shoulddrawhud ? hudViewSetup : fakesetup, nClearFlags, whatToDraw);
-}*/
-
-
 typedef void(__thiscall* PaintTraverseFn)(void*,unsigned int, bool, bool);
 PaintTraverseFn oPaintTraverse;
 void __fastcall hkPaintTraverse(void* thisptr,void*, unsigned int a, bool b, bool c)
@@ -410,12 +241,9 @@ void __fastcall hkPaintTraverse(void* thisptr,void*, unsigned int a, bool b, boo
 	if (hook["Call"].isFunction())
 	{
 		try {
-			hook["Call"]("Paint", g_pPanel->GetName(a));
+			hook["Call"]("Paint");
 		}
-		catch (LuaException const& e)
-		{
-			//If this is called then there was no hook for "Key" registered. This isn't an issue.
-		}
+		catch (LuaException const& e) {}
 	}
 	else
 	{
@@ -431,8 +259,7 @@ static struct vrect_t
 
 typedef void(__thiscall* ViewRenderFn)(void*, vrect_t* rect);
 ViewRenderFn oViewRender = nullptr;
-
-void __fastcall hkViewRender(void* pl, void* edx, vrect_t* rect) {
+void __fastcall hkViewRender(CHLClient* pl, void* edx, vrect_t* rect) {
 	oViewRender(pl, rect);
 
 	if (!g_pEngine->IsInGame())
@@ -453,10 +280,7 @@ void __fastcall hkViewRender(void* pl, void* edx, vrect_t* rect) {
 		try {
 			hook["Call"]("PaintSG");
 		}
-		catch (LuaException const& e)
-		{
-
-		}
+		catch (LuaException const& e) {}
 	}
 	else
 	{
@@ -490,33 +314,13 @@ void StartThread()
 	LOCKLUA();
 
 	g_pLuaEngine->Reset();
-	//std::string utf8Path = GetWorkDirectory().u8string();
-	//utf8Path = utf8Path + LUA_DIRSEP + "?.lua";
-	//printf("%s\n", utf8Path.c_str());
-
-	//inputmanager::Init();
-	//inputmanager::backend::keycallbacks.clear();
-	//inputmanager::backend::mcallbacks.clear();
-
 	InterfaceManager::GetInterfaces();
-
 	g_pEngine->ExecuteClientCmd("clear");
-
-	//VMT* clientmode = new VMT(g_pClientMode);
-	//clientmode->init();
-	//clientmode->setTableHook();
-	//clientmode->hookFunction(21, hkCreateMove); 
 
 	client = new VMT(g_pClient);
 	client->init();
 	client->setTableHook();
 	oViewRender = (ViewRenderFn)client->hookFunction(26, hkViewRender);
-	//oFrameStageNotify =  (FrameStageNotifyFn)client->hookFunction(35, hkFrameStageNotify);
-
-	//VMT* viewrender = new VMT(g_pViewRender);
-	//viewrender->init();
-	//viewrender->setTableHook();
-	//oRenderView = (RenderViewFn)viewrender->hookFunction(6, hkRenderView);
 
 	panel = new VMT(g_pPanel);
 	panel->init();
@@ -525,11 +329,8 @@ void StartThread()
 
 	RegEverything(g_pLuaEngine->L());
 	Msg("Garrysmod:Lua v1.0 loaded! Enjoy!\n");
-	//g_pLuaEngine->ExecuteFile("hook.lua");
 	g_pLuaEngine->ExecuteString(LUA_INJECT_CODE.c_str());
 	g_pLuaEngine->ExecuteFileBuffer("init.lua", ReadFile("init.lua"));
-	//inputmanager::AddKeyboardCallback(Keyboard);
-	//inputmanager::AddMouseCallback(Mouse);
 }
 
 static bool panic_key = false;

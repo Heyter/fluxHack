@@ -3,6 +3,8 @@
 #include "Vector.h"
 #include "math.h"
 #include "VMT.h"
+#include "Offsets.h"
+
 #define	FL_ONGROUND					(1 << 0)	
 #define FL_DUCKING					(1 << 1)	
 #define	FL_WATERJUMP				(1 << 2)	
@@ -37,81 +39,43 @@
 #define GETNETVAR(retntype, funcname, offset) \
 	retntype funcname() { \
 		return *(retntype*)(this + offset); }
-struct ClientClass;
 
 class CBaseEntity
 {
 public:
 
-	GETNETVAR(int,  GetTeamNum,0xF0);
-	GETNETVAR(int,  GetHealth, 0xFC);
-	GETNETVAR(unsigned int, GetFlags, 0x100);
-	GETNETVAR(int,  GetHitboxSet, 0x9F4);
-	GETNETVAR(Vector, GetAimPunch, 0x4C28);
-	GETNETVAR(int, GetTickBase, 0x33EC);
-	GETNETVAR(HANDLE, GetWeapon, 0x4AF8);
-	GETNETVAR(int, GetClip, 0x4E04); //GUN ONLY
-	GETNETVAR(int, GetClipReserve, 0x4E0C);
-	GETNETVAR(int, GetArmor, 0xC4F4);
-
-	void SetFlags(unsigned int flag)
-	{
-		*(unsigned int*)(this + 0x100) = flag;
+	int GetHealth() {
+		typedef int(__thiscall* fn)(void*);
+		return VMT::getvfunc<fn>(this, 108)(this);
+	}
+	
+	int GetMaxHealth() {
+		typedef int(__thiscall* fn)(void*);
+		return VMT::getvfunc<fn>(this, 109)(this);
 	}
 
-	Vector GetEyePosition()
-	{
-		static int offset = 0x104;
-		Vector vecViewOffset = *(Vector*)(this + offset);
-		return GetAbsOrigin() + vecViewOffset;
-	}
-
-	Vector& GetAbsOrigin()
-	{
+	Vector& GetAbsOrigin() {
 		typedef Vector&(__thiscall* fn)(void*);
-		return VMT::getvfunc<fn>(this, 10)(this);
+		return VMT::getvfunc<fn>(this, 9)(this);
 	}
 
-	ClientClass* GetClientClass()
-	{
-		void* networkable = (void*)(this + 0x8);
-		typedef ClientClass*(__thiscall* fn)(void*);
-		return VMT::getvfunc<fn>(networkable, 2)(networkable);
-	}
-
-	bool IsDormant()
-	{
-		void* networkable = (void*)(this + 0x8);
+	bool IsDormant() {
 		typedef bool(__thiscall* fn)(void*);
-		return VMT::getvfunc<fn>(networkable, 9)(networkable);
+		return VMT::getvfunc<fn>(this, 48)(this);
 	}
 
-	GETNETVAR(unsigned char, GetLifeState, 0x25B);
-
-
-	bool IsAlive()
-	{
+	/*GETNETVAR(unsigned char, GetLifeState, offsets.m_lifeState);
+	bool IsAlive() {
 		return (GetLifeState() == 0);
+	}*/
+	
+	bool IsAlive() {
+		typedef bool(__thiscall* fn)(void*);
+		return VMT::getvfunc<fn>(this, 129)(this);
 	}
 
-	int GetIndex()
-	{
-		return *(int*)(this + 0x64);
-	}
-
-	bool SetupBones(matrix3x4_t* pBoneToWorldOut, int maxBones, int boneMask, float currentTime)
-	{
-		void* renderable = (void*)(this + 0x4);
-		typedef bool(__thiscall* fn)(void*, matrix3x4_t*, int, int, float);
-		return VMT::getvfunc<fn>(renderable, 13)(renderable, pBoneToWorldOut, maxBones, boneMask, currentTime);
-	}
-
-
-	// model_t
-	void* GetModel()
-	{
-		void* renderable = (void*)(this + 0x4);
-		typedef void*(__thiscall* fn)(void*);
-		return VMT::getvfunc<fn>(renderable, 8)(renderable);
+	bool IsPlayer() {
+		typedef bool(__thiscall* fn)(void*);
+		return VMT::getvfunc<fn>(this, 130)(this);
 	}
 };

@@ -132,7 +132,7 @@
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
       <OptimizeReferences>true</OptimizeReferences>
       <AdditionalDependencies>lua535.lib;%(AdditionalDependencies)</AdditionalDependencies>
-      <GenerateDebugInformation>false</GenerateDebugInformation>
+      <GenerateDebugInformation>DebugFull</GenerateDebugInformation>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
@@ -157,19 +157,18 @@
     <ClCompile Include="LuaEngine.cpp" />
     <ClCompile Include="main.cpp" />
     <ClCompile Include="sdk\Console.cpp" />
-    <ClCompile Include="sdk\InputManager.cpp" />
     <ClCompile Include="sdk\InterfaceManager.cpp" />
     <ClCompile Include="sdk\interface\Engine.cpp" />
-    <ClCompile Include="sdk\interface\EngineTrace.cpp" />
     <ClCompile Include="sdk\interface\EntityList.cpp" />
     <ClCompile Include="sdk\interface\Globals.cpp" />
     <ClCompile Include="sdk\interface\GLua.cpp" />
-    <ClCompile Include="sdk\interface\ModelInfo.cpp" />
+    <ClCompile Include="sdk\interface\HLClient.cpp" />
     <ClCompile Include="sdk\interface\Panel.cpp" />
-    <ClCompile Include="sdk\interface\Predictionandmovement.cpp" />
     <ClCompile Include="sdk\interface\Scheme.cpp" />
     <ClCompile Include="sdk\interface\surface.cpp" />
+    <ClCompile Include="sdk\Offsets.cpp" />
     <ClCompile Include="sdk\PatternScanning.cpp" />
+    <ClCompile Include="sdk\UtilsFuncs.cpp" />
     <ClCompile Include="sdk\Vector.cpp" />
     <ClCompile Include="sdk\VMT.cpp" />
   </ItemGroup>
@@ -181,13 +180,10 @@
     <ClInclude Include="exports\LUAEntityList.h" />
     <ClInclude Include="exports\LuaFiles.h" />
     <ClInclude Include="exports\LUAInterfaces.h" />
-    <ClInclude Include="exports\LUATrace.h" />
-    <ClInclude Include="exports\LUAUserCmd.h" />
     <ClInclude Include="exports\LUAUtils.h" />
     <ClInclude Include="GLuaSharedApi.h" />
     <ClInclude Include="LuaBridge\detail\CFunctions.h" />
     <ClInclude Include="LuaBridge\detail\ClassInfo.h" />
-    <ClInclude Include="LuaBridge\detail\Config.h" />
     <ClInclude Include="LuaBridge\detail\Constructor.h" />
     <ClInclude Include="LuaBridge\detail\dump.h" />
     <ClInclude Include="LuaBridge\detail\FuncTraits.h" />
@@ -196,48 +192,41 @@
     <ClInclude Include="LuaBridge\detail\LuaHelpers.h" />
     <ClInclude Include="LuaBridge\detail\LuaRef.h" />
     <ClInclude Include="LuaBridge\detail\Namespace.h" />
-    <ClInclude Include="LuaBridge\detail\Security.h" />
     <ClInclude Include="LuaBridge\detail\Stack.h" />
     <ClInclude Include="LuaBridge\detail\TypeList.h" />
     <ClInclude Include="LuaBridge\detail\TypeTraits.h" />
     <ClInclude Include="LuaBridge\detail\Userdata.h" />
-    <ClInclude Include="LuaBridge\List.h" />
     <ClInclude Include="LuaBridge\LuaBridge.h" />
-    <ClInclude Include="LuaBridge\Map.h" />
     <ClInclude Include="LuaBridge\RefCountedObject.h" />
     <ClInclude Include="LuaBridge\RefCountedPtr.h" />
-    <ClInclude Include="LuaBridge\UnorderedMap.h" />
-    <ClInclude Include="LuaBridge\Vector.h" />
     <ClInclude Include="LuaEngine.h" />
     <ClInclude Include="lua\include\lauxlib.h" />
     <ClInclude Include="lua\include\lua.h" />
     <ClInclude Include="lua\include\lua.hpp" />
     <ClInclude Include="lua\include\luaconf.h" />
     <ClInclude Include="lua\include\lualib.h" />
-    <ClInclude Include="resource.h" />
     <ClInclude Include="sdk\Address.h" />
     <ClInclude Include="sdk\CBaseEntity.h" />
-    <ClInclude Include="sdk\cmove.h" />
     <ClInclude Include="sdk\Console.h" />
     <ClInclude Include="sdk\convar.h" />
     <ClInclude Include="sdk\HookBase.h" />
-    <ClInclude Include="sdk\InputManager.h" />
     <ClInclude Include="sdk\InterfaceManager.hpp" />
     <ClInclude Include="Drawing.h" />
     <ClInclude Include="sdk\interface\Engine.h" />
-    <ClInclude Include="sdk\interface\EngineTrace.h" />
     <ClInclude Include="sdk\interface\EntityList.h" />
     <ClInclude Include="sdk\interface\Globals.h" />
     <ClInclude Include="sdk\interface\GLua.h" />
+    <ClInclude Include="sdk\interface\HLClient.h" />
     <ClInclude Include="sdk\interface\InterfaceBase.h" />
-    <ClInclude Include="sdk\interface\ModelInfo.h" />
     <ClInclude Include="sdk\interface\Panel.h" />
-    <ClInclude Include="sdk\interface\Predictionandmovement.h" />
     <ClInclude Include="sdk\interface\Scheme.h" />
     <ClInclude Include="sdk\interface\Surface.h" />
     <ClInclude Include="sdk\math.h" />
+    <ClInclude Include="sdk\NetVarManager.h" />
+    <ClInclude Include="sdk\Offsets.h" />
     <ClInclude Include="sdk\PatternScanning.h" />
-    <ClInclude Include="sdk\usercmd.h" />
+    <ClInclude Include="sdk\recv.h" />
+    <ClInclude Include="sdk\UtilsFuncs.h" />
     <ClInclude Include="sdk\Vector.h" />
     <ClInclude Include="sdk\VMT.h" />
   </ItemGroup>
