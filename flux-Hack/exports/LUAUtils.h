@@ -4,20 +4,13 @@
 #include "../sdk/Vector.h"
 #include "../sdk/CBaseEntity.h"
 #include "../sdk/interface/Scheme.h"
+#include "../sdk/CUserCmd.h"
 #include "Exports.h"
 
 class LUAUtils : public BaseLuaExport
 {
-
 public:
-	//bool IsPlayer(/*int entNum*/)
-	//{
-		//player_info_t info;
-		//return (g_pEngine->GetPlayerInfo(entNum, &info));
-	//}
-
-	LUAEntity LocalPlayer()
-	{
+	LUAEntity LocalPlayer() {
 		return LUAEntity(g_pClientEntList->GetClientEntity(g_pEngine->GetLocalPlayer()));
 	}
 	
@@ -26,7 +19,10 @@ public:
 			return 0;
 		return g_pScheme->GetIScheme(g_pScheme->GetScheme(tag))->GetFont(fontName, proportional);
 	}
-
+	
+	void Prediction(CUserCmd* cmd, CBaseEntity* player) { // later
+		return;
+	}
 private:
 	__forceinline float DotProduct(const Vector v1, const float* v2)
 	{
@@ -39,6 +35,5 @@ private:
 		out[1] = DotProduct(in1, in2[1]) + in2[1][3];
 		out[2] = DotProduct(in1, in2[2]) + in2[2][3];
 	}
-
 };
 extern LUAUtils g_Utils;

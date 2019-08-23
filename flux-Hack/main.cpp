@@ -55,10 +55,11 @@ Vector Vector::ToScreen() {
 
 		return screen;
 	}
+	
 	screen.x *= 100000;
 	screen.y *= 100000;
 
-		return screen;
+	return screen;
 	
 }
 typedef void(__cdecl *MsgFn)(char const* pMsg, va_list);
@@ -114,7 +115,7 @@ static std::string ReadFile(const std::string& path) {
 	return ss.str();
 }
 
-void IncludeLua(std::string file) {
+static void IncludeLua(std::string file) {
 	g_pLuaEngine->ExecuteFileBuffer(file.c_str(), ReadFile(file.c_str()));
 }
 
@@ -166,16 +167,28 @@ static void RegEverything(lua_State* L)
 				.addData("x", &Vec2::x)
 				.addData("y", &Vec2::y)
 			.endClass()
+			.beginClass<LuaUserCmd>("UserCmd")
+				.addProperty("viewangles", &LuaUserCmd::GetViewAngles, &LuaUserCmd::SetViewAngles)
+				.addFunction("IsKeyDown", &LuaUserCmd::IsKeyDown)
+				.addFunction("GetButtons", &LuaUserCmd::GetButtons)
+				.addFunction("RemoveKey", &LuaUserCmd::RemoveKey)
+				.addFunction("SetButtons", &LuaUserCmd::SetButtons)
+			.endClass()
 			.beginClass<LUAEntity>("Entity")
 				.addFunction("IsValid", &LUAEntity::IsValid)
 				.addFunction("GetPos", &LUAEntity::GetPos)
 				.addFunction("GetHealth", &LUAEntity::GetHealth)
+				.addFunction("WaterLevel", &LUAEntity::WaterLevel)
+				.addFunction("GetMoveType", &LUAEntity::GetMoveType)
+				.addFunction("GetFlags", &LUAEntity::GetFlags)
 				.addFunction("GetMaxHealth", &LUAEntity::GetMaxHealth)
 				.addFunction("IsDormant", &LUAEntity::IsDormant)
 				.addFunction("IsAlive", &LUAEntity::IsAlive)
+				.addFunction("Alive", &LUAEntity::Alive)
 				.addFunction("IsPlayer", &LUAEntity::IsPlayer)
 				.addFunction("IsReal", &LUAEntity::IsReal)
 				.addFunction("Nick", &LUAEntity::GetName)
+				.addFunction("EntIndex", &LUAEntity::entIndex)
 			.endClass()
 			.beginClass<LUAEntityList>("EntityList")
 				.addFunction("GetEntity", &LUAEntityList::GetEntity)
@@ -220,8 +233,6 @@ static void RegEverything(lua_State* L)
 				.addFunction("GetTable", &CGLuaInterface::GetTable)
 			.endClass()
 		.endNamespace();
-
-	g_pLuaEngine->ExecuteString("bit = bit32");
 }
 
 typedef void(__thiscall* PaintTraverseFn)(void*,unsigned int, bool, bool);
@@ -288,6 +299,35 @@ void __fastcall hkViewRender(CHLClient* pl, void* edx, vrect_t* rect) {
 	}
 }
 
+typedef bool(__thiscall* CreateMoveFn)(void*, float, CUserCmd*);
+CreateMoveFn oCreateMove = nullptr;
+
+bool __fastcall hkCreateMove(void* cl, void* edx, float frametime, CUserCmd* cmd) {
+	oCreateMove(cl, frametime, cmd);
+	
+	LOCKLUA();
+	if (!g_pLuaEngine->L())
+		return false;
+	
+	using namespace luabridge;
+	LuaRef hook = getGlobal(g_pLuaEngine->L(), "hook");
+	if (hook["Call"].isFunction())
+	{
+		try {
+			hook["Call"]("CreateMove", LuaUserCmd(cmd), frametime);
+		}
+		catch (LuaException const& e) {}
+	}
+	else
+	{
+		printf("ERR: PT - hook.Call not found!\n");
+	}
+	
+	oCreateMove(cl, frametime, cmd);
+
+	return false;
+}
+
 static void loadscript(std::vector<std::string> args)
 {
 	LOCKLUA();
@@ -295,6 +335,7 @@ static void loadscript(std::vector<std::string> args)
 	printf("Executed %s!\n", args[1].c_str());
 }
 
+static VMT* clientmode = nullptr;
 static VMT* client = nullptr;
 static VMT* panel = nullptr;
 
@@ -302,9 +343,11 @@ void StartThread();
 static void reset(std::vector<std::string> args) {
 	(ViewRenderFn)client->unhookFunction(26);
 	(PaintTraverseFn)panel->unhookFunction(16);
+	(CreateMoveFn)clientmode->unhookFunction(21);
 	
 	client->shutdown();
 	panel->shutdown();
+	clientmode->shutdown();
 	
 	StartThread();
 }
@@ -316,6 +359,11 @@ void StartThread()
 	g_pLuaEngine->Reset();
 	InterfaceManager::GetInterfaces();
 	g_pEngine->ExecuteClientCmd("clear");
+	
+	clientmode = new VMT(g_pClientMode);
+	clientmode->init();
+	clientmode->setTableHook();
+	oCreateMove = (CreateMoveFn)clientmode->hookFunction(21, hkCreateMove);
 
 	client = new VMT(g_pClient);
 	client->init();
@@ -328,7 +376,6 @@ void StartThread()
 	oPaintTraverse = (PaintTraverseFn)panel->hookFunction(41, hkPaintTraverse);
 
 	RegEverything(g_pLuaEngine->L());
-	Msg("Garrysmod:Lua v1.0 loaded! Enjoy!\n");
 	g_pLuaEngine->ExecuteString(LUA_INJECT_CODE.c_str());
 	g_pLuaEngine->ExecuteFileBuffer("init.lua", ReadFile("init.lua"));
 }
@@ -381,12 +428,19 @@ BOOL WINAPI DllMain(HINSTANCE hMod, DWORD dwReason, LPVOID reserved)
 		case DLL_PROCESS_DETACH:
 			(ViewRenderFn)client->unhookFunction(26);
 			(PaintTraverseFn)panel->unhookFunction(16);
+			(CreateMoveFn)clientmode->unhookFunction(21);
 			
 			client->shutdown();
 			panel->shutdown();
+			clientmode->shutdown();
 			
 			FreeConsole();
 			g_pLuaEngine->Close();
+			if (g_pLuaEngine) {
+				delete g_pLuaEngine;
+				g_pLuaEngine = nullptr;
+			}
+			
 			break;
 		default:
 			break;

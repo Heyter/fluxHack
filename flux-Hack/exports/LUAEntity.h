@@ -1,6 +1,7 @@
 #pragma once
 #include "BaseLuaExport.h"
 #include "../sdk/CBaseEntity.h"
+#include "../sdk/interface/GLua.h"
 
 class LUAEntity : public BaseLuaExport
 {
@@ -19,6 +20,14 @@ public:
 		return m_pEnt->GetHealth();
 	}
 	
+	int WaterLevel() {
+		return m_pEnt->WaterLevel();
+	}
+	
+	int GetFlags() {
+		return m_pEnt->GetFlags();
+	}
+	
 	int GetMaxHealth() {
 		return m_pEnt->GetMaxHealth();
 	}
@@ -31,6 +40,10 @@ public:
 		return m_pEnt->IsAlive();
 	}
 	
+	bool Alive() {
+		return m_pEnt->GetHealth() > 0;
+	}
+	
 	bool IsPlayer() {
 		return m_pEnt->IsPlayer();
 	}
@@ -39,16 +52,37 @@ public:
 		return (IsValid() && IsAlive() && !IsDormant());
 	}
 
-	operator CBaseEntity*()
-	{
+	operator CBaseEntity*() {
 		return m_pEnt;
 	}
+	
+	int entIndex() {
+		return m_pEnt->entIndex();
+	}
 
-	std::string GetName(int entNum)
-	{
+	std::string GetName() {
 		player_info_t info;
-		g_pEngine->GetPlayerInfo(entNum, &info);
+		g_pEngine->GetPlayerInfo(entIndex(), &info);
 		return std::string(info.name);
+	}
+	
+	int GetMoveType()
+	{
+		auto lua = g_pGLuaShared->GetLuaInterface(GLuaInterfaceType::CLIENT);
+		lua->PushSpecial(SPECIAL_GLOB);
+		lua->GetField(-1, "Entity");
+		lua->PushNumber(entIndex());
+		lua->Call(1, 1);
+		
+		lua->GetField(-1, "GetMoveType");
+		lua->Push(-2);
+		lua->Call(1, 1);
+		
+		int type = lua->GetNumber();
+		lua->Pop(3);
+		
+		return type;
+		
 	}
 private:
 	CBaseEntity* m_pEnt;

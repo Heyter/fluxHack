@@ -39,10 +39,21 @@
 #define GETNETVAR(retntype, funcname, offset) \
 	retntype funcname() { \
 		return *(retntype*)(this + offset); }
+		
+class IClientNetworkable
+{
+public:
+	int entIndex() {
+		typedef int(__thiscall* fn)(void*);
+		return VMT::getvfunc<fn>(this, 9)(this);
+	}
+};
 
 class CBaseEntity
 {
 public:
+	GETNETVAR(int, GetFlags, offsets.m_fFlags);
+	GETNETVAR(int, WaterLevel, offsets.m_nWaterLevel);
 
 	int GetHealth() {
 		typedef int(__thiscall* fn)(void*);
@@ -77,5 +88,14 @@ public:
 	bool IsPlayer() {
 		typedef bool(__thiscall* fn)(void*);
 		return VMT::getvfunc<fn>(this, 130)(this);
+	}
+	
+	IClientNetworkable* GetClientNetworkable() {
+		typedef IClientNetworkable*(__thiscall* fn)(void*);
+		return VMT::getvfunc<fn>(this, 4)(this);
+	}
+	
+	int entIndex() {
+		return GetClientNetworkable()->entIndex();
 	}
 };

@@ -58,6 +58,33 @@ public:
 	}
 	std::vector<RecvTable*> m_tables;
 private:
+	std::string TypeToString(SendPropType type)
+	{
+		switch (type)
+		{
+		case DPT_Int:
+			return "INT";
+		case DPT_Float:
+			return "FLOAT";
+		case DPT_Vector:
+			return "VECTOR3";
+		case DPT_VectorXY:
+			return "VECTOR2";
+		case DPT_String:
+			return "STRING";
+		case DPT_Array:
+			return "ARRAY";
+		case DPT_DataTable:
+			return "TABLE";
+		case DPT_Int64:
+			return "INT64";
+		case DPT_NUMSendPropTypes:
+			return "NUMSendPropTypes";
+		default:
+			return "UNKNOWN";
+		}
+	}
+
 	int GetProp(const char *tableName, const char *propName, RecvProp **prop = 0)
 	{
 		RecvTable *recvTable = GetTable(tableName);
@@ -139,7 +166,7 @@ private:
 			if (varName.find("baseclass") == 0 || varName.find("0") == 0 || varName.find("1") == 0 || varName.find("2") == 0)
 				continue;
 
-			ss << pre << "\t" << varName << " [0x" << std::hex << prop->m_Offset << "]\n";
+			ss << pre << "\t" << varName << " [0x" << std::hex << prop->m_Offset << "] (" << TypeToString(prop->m_RecvType) << ")\n";
 
 			if (prop->m_pDataTable)
 				ss << DumpTable(prop->m_pDataTable, depth + 1);

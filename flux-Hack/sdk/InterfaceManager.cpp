@@ -18,9 +18,12 @@ static void HookOffsets() {
 	CNetworkedVariableManager* NVMGR = new CNetworkedVariableManager();
 	NVMGR->DumpNetvars();
 	
-	offsets.m_lifeState = NVMGR->GetOffset("DT_BasePlayer", "m_lifeState");
+	//offsets.m_lifeState = NVMGR->GetOffset("DT_BasePlayer", "m_lifeState");
+	offsets.m_fFlags = NVMGR->GetOffset("DT_BasePlayer", "m_fFlags");
+	offsets.m_nWaterLevel = NVMGR->GetOffset("DT_GMOD_Player", "m_nWaterLevel");
 }
 
+void* g_pClientMode;
 void InterfaceManager::GetInterfaces()
 {
 	g_pClient = (CHLClient*)GetInterface("client.dll", "VClient");
@@ -35,6 +38,10 @@ void InterfaceManager::GetInterfaces()
 	Address pShutdown = (CDLLTable.As<DWORD*>())[0];
 	g_pGlobals = *pShutdown.GetOffset(0x55).To<CGlobals**>();
 	print("g_pGlobals found 0x%X\n", g_pGlobals);
+	
+	pShutdown = (CDLLTable.As<DWORD*>())[10];
+	g_pClientMode = *pShutdown.GetOffset(0x5).To<CGlobals**>();
+	print("g_pClientMode found 0x%X\n", g_pClientMode);
 	
 	HookOffsets();
 }

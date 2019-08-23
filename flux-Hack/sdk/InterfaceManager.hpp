@@ -7,3 +7,5 @@ public:
 	static void GetInterfaces();
 	static void* GetInterface(char* modulename, char* interfacename);
 };
+
+extern void* g_pClientMode;

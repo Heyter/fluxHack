@@ -43,13 +43,9 @@ public:
 		return retn;
 	}
 
-	void ExecuteClientCmd(const char* str)
-	{
+	void ExecuteClientCmd(const char* str) {
 		m_pEngine->ExecuteClientCmd(str);
 	}
-
-
 private:
 	CEngine* m_pEngine;
-
 };
